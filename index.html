@@ -546,6 +546,46 @@
       from{ opacity:0; transform:translateX(-8px); }
       to{ opacity:1; transform:translateX(0); }
     }
+    @media (max-width: 1199.98px){
+      .proj-shell{
+        grid-template-columns:1fr;
+        gap:1rem;
+      }
+      .proj-rail{
+        width:240px;
+        height:240px;
+        margin:.3rem auto 0;
+      }
+      .proj-tab{
+        width:52px;
+        height:52px;
+        transform:
+          translate(-50%,-50%)
+          rotate(calc((360deg / 7) * var(--i)))
+          translateX(90px)
+          rotate(calc((360deg / -7) * var(--i)));
+      }
+      .proj-tab:hover{
+        transform:
+          translate(-50%,-50%)
+          rotate(calc((360deg / 7) * var(--i)))
+          translateX(95px)
+          rotate(calc((360deg / -7) * var(--i)));
+      }
+      .proj-tab.is-active{
+        transform:
+          translate(-50%,-50%)
+          rotate(calc((360deg / 7) * var(--i)))
+          translateX(99px)
+          rotate(calc((360deg / -7) * var(--i)))
+          scale(1.08);
+      }
+      .proj-rail::after{
+        width:80px;
+        height:80px;
+        font-size:.72rem;
+      }
+    }
     @media (max-width: 991.98px){
       .exp-body{ grid-template-columns:1fr; }
       .navbar{ padding:.58rem 0; }
@@ -564,7 +604,6 @@
         flex-direction:row; overflow:auto; padding:.75rem;
       }
       .exp-node{ min-width:220px; }
-      .proj-shell{ grid-template-columns:1fr; }
       .skill-view{ grid-template-columns:1fr; }
       .contact-shell{ grid-template-columns:1fr; min-height:auto; gap:.9rem; }
       .contact-side{ min-height:300px; padding:1.6rem 1.2rem 1.5rem; }
@@ -577,46 +616,93 @@
       }
       .service-item.featured,
       .service-item.standard{ grid-column:span 12; }
+      .proj-stage{
+        min-height:unset;
+        overflow:visible;
+      }
+      .proj-panel{
+        position:relative;
+        inset:auto;
+        opacity:1;
+        transform:none;
+        pointer-events:auto;
+        transition:none;
+        padding:1.2rem 1.1rem 1.05rem;
+        display:none;
+      }
+      .proj-panel.is-active{
+        display:block;
+      }
+      .proj-step{
+        gap:.8rem;
+        margin-bottom:.8rem;
+      }
+      .proj-title{
+        font-size:clamp(1.25rem, 6vw, 1.6rem);
+        line-height:1.1;
+      }
+      .proj-num{
+        font-size:3.1rem;
+        min-width:48px;
+      }
+      .proj-dot{
+        margin:.55rem 0 1rem 3.7rem;
+      }
+      .proj-desc{
+        max-width:100%;
+        font-size:.96rem;
+        line-height:1.52;
+      }
+      .proj-tab-num{ font-size:1.03rem; }
+    }
+    @media (max-width: 575.98px){
+      .proj-stage{ border-radius:20px; }
+      .proj-panel{ padding:1rem .9rem .9rem; }
+      .proj-step{
+        align-items:flex-start;
+        gap:.55rem;
+      }
+      .proj-title{
+        font-size:1.3rem;
+        word-break:break-word;
+      }
+      .proj-num{
+        font-size:2.7rem;
+        min-width:38px;
+      }
+      .proj-dot{
+        width:20px;
+        height:20px;
+        margin:.45rem 0 .8rem 2.9rem;
+      }
       .proj-rail{
-        width:220px;
-        height:220px;
-        margin:.5rem auto 0;
+        width:210px;
+        height:210px;
       }
       .proj-tab{
-        width:48px;
-        height:48px;
+        width:46px;
+        height:46px;
         transform:
           translate(-50%,-50%)
           rotate(calc((360deg / 7) * var(--i)))
-          translateX(82px)
+          translateX(78px)
           rotate(calc((360deg / -7) * var(--i)));
       }
       .proj-tab:hover{
         transform:
           translate(-50%,-50%)
           rotate(calc((360deg / 7) * var(--i)))
-          translateX(86px)
+          translateX(82px)
           rotate(calc((360deg / -7) * var(--i)));
       }
       .proj-tab.is-active{
         transform:
           translate(-50%,-50%)
           rotate(calc((360deg / 7) * var(--i)))
-          translateX(90px)
+          translateX(86px)
           rotate(calc((360deg / -7) * var(--i)))
-          scale(1.08);
+          scale(1.07);
       }
-      .proj-tab-num{ font-size:1.08rem; }
-      .proj-rail::after{
-        width:72px;
-        height:72px;
-        font-size:.68rem;
-      }
-      .proj-stage{ min-height:520px; }
-      .proj-title{ font-size:1.6rem; }
-      .proj-num{ font-size:3.8rem; min-width:62px; }
-      .proj-dot{ margin-left:6.3rem; }
-      .proj-desc{ max-width:100%; font-size:.98rem; }
     }
     .play-burst-dot{
       position:fixed;
@@ -1279,6 +1365,338 @@
     }
     .btn-contact-alt:hover{ color:var(--text-inverse); border-color:color-mix(in srgb,var(--muted-inverse) 42%, transparent); }
 
+    /* Mobile layout system: keep complex desktop interactions stable on phones */
+    @media (max-width: 991.98px){
+      .section{
+        padding:64px 0;
+        scroll-margin-top:72px;
+      }
+      body::before{
+        opacity:.12;
+      }
+      .blob{
+        display:none;
+      }
+      #backToTop{
+        right:14px;
+        bottom:14px;
+        padding:.5rem .66rem;
+        font-size:1rem;
+      }
+      .navbar .container{
+        padding:.35rem .5rem;
+      }
+      .navbar-brand{
+        max-width:calc(100vw - 132px);
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        font-size:.95rem;
+      }
+      .theme-btn{
+        margin-left:.3rem;
+      }
+      .hero{
+        padding:96px 0 44px;
+      }
+      .headline{
+        font-size:clamp(2rem, 9vw, 2.8rem);
+        line-height:1.06;
+      }
+      .chips{
+        gap:.4rem;
+      }
+      .chip{
+        font-size:.86rem;
+        padding:.42rem .7rem;
+      }
+      .profile-wrap{
+        text-align:center !important;
+      }
+      .profile-pic{
+        max-width:300px;
+      }
+      .hero-icons{
+        flex-direction:column;
+        align-items:stretch;
+        gap:.55rem !important;
+      }
+      .hero-icons a{
+        width:100%;
+        justify-content:center;
+      }
+      .stat{
+        padding:16px;
+      }
+      .stat .num{
+        font-size:1.6rem;
+      }
+      .stat .label{
+        font-size:.9rem;
+      }
+
+      .skills-top{
+        gap:.65rem;
+      }
+      .skills-tabs{
+        width:100%;
+      }
+      .skill-tab{
+        flex:1 1 0;
+        justify-content:center;
+      }
+      .skills-meta{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .skills-body{
+        padding:.85rem;
+      }
+      .skill-card{
+        padding:.85rem .85rem .8rem;
+      }
+
+      /* Experience: switch from animated carousel to stacked cards */
+      .exp-topbar{
+        display:block;
+      }
+      .exp-level{
+        margin-bottom:.25rem;
+      }
+      .exp-progress-track,
+      .exp-counter,
+      .exp-controls{
+        display:none !important;
+      }
+      .exp-body{
+        display:block;
+        min-height:auto;
+      }
+      .exp-map{
+        display:grid !important;
+        grid-auto-flow:column;
+        grid-auto-columns:calc(100% - 124px);
+        gap:.5rem;
+        overflow-x:auto;
+        overflow-y:hidden;
+        scroll-snap-type:x proximity;
+        scroll-padding-inline:62px;
+        -webkit-overflow-scrolling:touch;
+        border:none;
+        background:transparent;
+        padding:.35rem .2rem .7rem;
+      }
+      .exp-node{
+        min-width:0;
+        width:auto;
+        scroll-snap-align:start;
+      }
+      .exp-stage-wrap{
+        padding:.2rem .2rem .35rem;
+      }
+      .exp-stage{
+        min-height:auto;
+        background:transparent;
+        border:none;
+        box-shadow:none;
+      }
+      .exp-slide{
+        position:relative !important;
+        inset:auto !important;
+        opacity:1 !important;
+        transform:none !important;
+        pointer-events:auto !important;
+        display:block !important;
+        margin-bottom:.7rem;
+        border:1px solid var(--border);
+        border-radius:14px;
+        background:var(--card);
+        box-shadow:var(--shadow);
+        padding:.95rem .95rem .9rem;
+        display:none !important;
+      }
+      .exp-slide.is-active{
+        display:block !important;
+      }
+      .exp-points{
+        margin:.75rem 0 0;
+      }
+      .exp-points li{
+        font-size:.93rem;
+      }
+
+      /* Projects: replace orbit interaction with readable stacked cards */
+      .proj-shell{
+        display:block;
+      }
+      .proj-stage{
+        min-height:auto !important;
+        overflow:visible !important;
+        border-radius:16px;
+      }
+      .proj-panel{
+        position:relative !important;
+        inset:auto !important;
+        opacity:1 !important;
+        transform:none !important;
+        pointer-events:auto !important;
+        transition:none !important;
+        display:block !important;
+        padding:1rem .95rem .9rem;
+        border-bottom:1px solid var(--border);
+      }
+      .proj-panel:last-child{
+        border-bottom:none;
+      }
+      .proj-step{
+        margin-bottom:.65rem;
+      }
+      .proj-num{
+        min-width:40px;
+        font-size:2.4rem;
+      }
+      .proj-title{
+        font-size:1.25rem;
+        line-height:1.15;
+      }
+      .proj-dot{
+        display:none;
+      }
+      .proj-desc{
+        max-width:100%;
+        font-size:.95rem;
+        line-height:1.5;
+      }
+      .project-tags{
+        margin-top:.85rem;
+      }
+      .proj-rail{
+        display:none !important;
+      }
+
+      .services-shell{
+        padding:1rem;
+      }
+      .service-grid{
+        gap:.7rem;
+      }
+      .service-item{
+        padding:.9rem .85rem .85rem;
+      }
+      .services-kpis{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .service-pill{
+        padding:.36rem .6rem;
+      }
+
+      .contact-side{
+        min-height:280px;
+      }
+      .contact-art{
+        width:min(50%,230px);
+      }
+      .contact-form-card{
+        margin:.25rem 0 0 !important;
+      }
+      .contact-actions{
+        gap:.5rem;
+      }
+      .btn-contact-submit,
+      .btn-contact-alt{
+        width:100%;
+      }
+
+      .popup-content{
+        width:min(92vw, 360px);
+        padding:30px 20px;
+      }
+      .popup-content h2{
+        font-size:1.4rem;
+      }
+      .popup-content p{
+        font-size:1rem;
+      }
+    }
+    @media (max-width: 575.98px){
+      .section{
+        padding:56px 0;
+      }
+      .hero{
+        padding:88px 0 36px;
+      }
+      .container{
+        padding-left:14px;
+        padding-right:14px;
+      }
+      .navbar-brand{
+        font-size:.86rem;
+        max-width:calc(100vw - 124px);
+      }
+      .brand-mark{
+        width:1.62rem;
+        height:1.62rem;
+        margin-right:.34rem;
+        font-size:.66rem;
+      }
+      .theme-btn{
+        padding:.35rem .5rem;
+      }
+      .exp-head{
+        gap:.55rem;
+      }
+      .exp-map{
+        grid-auto-columns:calc(100% - 96px);
+        scroll-padding-inline:48px;
+      }
+      .exp-role{
+        font-size:1rem;
+      }
+      .exp-company,
+      .exp-period{
+        font-size:.86rem;
+      }
+      .service-item h5{
+        font-size:1.02rem;
+      }
+      .service-item p{
+        font-size:.9rem;
+      }
+      .contact-side{
+        padding:1.3rem 1rem 1.05rem;
+      }
+      .contact-side h3{
+        font-size:clamp(1.65rem, 8.5vw, 2.15rem);
+      }
+      .contact-side p{
+        font-size:.95rem;
+        line-height:1.38;
+      }
+      .contact-form-card{
+        padding:.85rem;
+        border-radius:18px;
+      }
+      .contact-actions{
+        margin-top:.8rem;
+      }
+      .contact-field{
+        border-radius:14px;
+        padding:.72rem .85rem;
+      }
+      textarea.contact-field{
+        min-height:130px;
+      }
+      .popup-content{
+        width:min(94vw, 330px);
+        padding:24px 16px;
+      }
+      .checkmark{
+        width:64px;
+        height:64px;
+      }
+    }
+
     .popup { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:2000; opacity:0; transition:opacity .5s ease; }
     .popup.show { display:flex; opacity:1; }
     .popup-content { background:var(--card); color:var(--text); padding:50px 40px; border-radius:15px; text-align:center; width:420px; max-width:92%; box-shadow: var(--shadow); animation: scaleIn .4s ease; border:1px solid var(--border); }
@@ -1293,6 +1711,74 @@
     #popup.show .popup-content.animate { animation: popScale .3s .9s ease-out both; }
     @keyframes stroke { to { stroke-dashoffset: 0; } }
     @keyframes popScale { 0% { transform: scale(0.98); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+    @media (max-width: 991.98px){
+      .popup-content{
+        width:min(92vw, 360px);
+        padding:30px 20px;
+      }
+      .popup-content h2{
+        font-size:1.4rem;
+      }
+      .popup-content p{
+        font-size:1rem;
+      }
+    }
+    @media (max-width: 575.98px){
+      .popup-content{
+        width:min(94vw, 330px);
+        padding:24px 16px;
+      }
+      .checkmark{
+        width:64px;
+        height:64px;
+      }
+    }
+    @media (max-width: 1199.98px){
+      .services-shell{
+        padding:1.1rem;
+      }
+      .service-item.featured{
+        grid-column:span 12;
+        min-height:unset;
+      }
+      .service-item.standard{
+        grid-column:span 6;
+      }
+
+      .contact-shell{
+        grid-template-columns:1fr;
+        gap:1rem;
+        min-height:auto;
+      }
+      .contact-side{
+        min-height:320px;
+        border-radius:24px;
+      }
+      .contact-form-card{
+        margin:0 !important;
+        border-radius:24px;
+      }
+      .contact-form-card form .row{
+        --bs-gutter-x:.65rem;
+        --bs-gutter-y:.65rem;
+      }
+      .contact-actions{
+        gap:.55rem;
+      }
+      .btn-contact-submit,
+      .btn-contact-alt{
+        width:100%;
+        flex:1 1 auto;
+      }
+    }
+    @media (max-width: 767.98px){
+      .service-item.standard{
+        grid-column:span 12;
+      }
+      .contact-side{
+        min-height:270px;
+      }
+    }
   </style>
 </head>
 <body data-bs-spy="scroll" data-bs-target="#topnav" data-bs-offset="84" tabindex="0">
@@ -1854,6 +2340,7 @@
       const expAuto = document.getElementById("expAuto");
       const expNodes = Array.from(document.querySelectorAll(".exp-node"));
       const expSlides = Array.from(document.querySelectorAll(".exp-slide"));
+      const expMap = expShell ? expShell.querySelector(".exp-map") : null;
       const projDeck = document.getElementById("projDeck");
       const projTabs = Array.from(document.querySelectorAll(".proj-tab"));
       const projPanels = Array.from(document.querySelectorAll(".proj-panel"));
@@ -1972,6 +2459,34 @@
         };
 
         expTotal.textContent = String(expSlides.length);
+        const isMobileExperienceView = () => window.matchMedia("(max-width: 991.98px)").matches;
+        const setMobileSlide = (index) => {
+          currentIndex = index;
+          expSlides.forEach((slide, idx) => {
+            slide.classList.remove(...slideStateClasses);
+            if (idx === index) {
+              slide.classList.add("is-active");
+              slide.style.display = "block";
+            } else {
+              slide.style.display = "none";
+            }
+          });
+          expNodes.forEach((node, idx) => {
+            const active = idx === currentIndex;
+            node.classList.toggle("is-active", active);
+            node.setAttribute("aria-selected", active ? "true" : "false");
+          });
+          expCurrent.textContent = String(currentIndex + 1);
+          expProgress.style.width = `${((currentIndex + 1) / expSlides.length) * 100}%`;
+          const activeNode = expNodes[currentIndex];
+          if (activeNode && expMap) {
+            const motion = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+            const maxScroll = Math.max(0, expMap.scrollWidth - expMap.clientWidth);
+            const centered = activeNode.offsetLeft - ((expMap.clientWidth - activeNode.clientWidth) / 2);
+            const targetLeft = Math.min(maxScroll, Math.max(0, centered));
+            expMap.scrollTo({ left: targetLeft, behavior: motion });
+          }
+        };
 
         const normalizeSlides = (index) => {
           expSlides.forEach((slide, idx) => {
@@ -1998,6 +2513,7 @@
         };
 
         const startAuto = () => {
+          if (isMobileExperienceView()) return;
           clearInterval(autoTimer);
           autoTimer = setInterval(() => {
             goTo((currentIndex + 1) % expSlides.length, 1);
@@ -2010,6 +2526,7 @@
         };
 
         const setAutoState = (enabled) => {
+          if (isMobileExperienceView() && enabled) enabled = false;
           isAutoPlaying = enabled;
           expAuto.innerHTML = enabled
             ? '<i class="bi bi-lightning-charge"></i>Auto Play On'
@@ -2019,6 +2536,10 @@
         };
 
         const goTo = (nextIndex, direction = 1) => {
+          if (isMobileExperienceView()) {
+            setMobileSlide(nextIndex);
+            return;
+          }
           if (isAnimating || nextIndex === currentIndex) return;
           isAnimating = true;
           expShell.classList.add("is-switching");
@@ -2050,6 +2571,10 @@
           node.addEventListener("click", () => {
             const target = Number(node.dataset.expIndex);
             if (Number.isNaN(target)) return;
+            if (isMobileExperienceView()) {
+              setMobileSlide(target);
+              return;
+            }
             const dir = target > currentIndex ? 1 : -1;
             if (isAutoPlaying) {
               stopAuto();
@@ -2060,6 +2585,10 @@
         });
 
         expPrev.addEventListener("click", () => {
+          if (isMobileExperienceView()) {
+            setMobileSlide((currentIndex - 1 + expSlides.length) % expSlides.length);
+            return;
+          }
           if (isAutoPlaying) {
             stopAuto();
             startAuto();
@@ -2067,21 +2596,31 @@
           goTo((currentIndex - 1 + expSlides.length) % expSlides.length, -1);
         });
         expNext.addEventListener("click", () => {
+          if (isMobileExperienceView()) {
+            setMobileSlide((currentIndex + 1) % expSlides.length);
+            return;
+          }
           if (isAutoPlaying) {
             stopAuto();
             startAuto();
           }
           goTo((currentIndex + 1) % expSlides.length, 1);
         });
-        expAuto.addEventListener("click", () => setAutoState(!isAutoPlaying));
+        expAuto.addEventListener("click", () => {
+          if (isMobileExperienceView()) return;
+          setAutoState(!isAutoPlaying);
+        });
 
         expShell.addEventListener("mouseenter", () => {
+          if (isMobileExperienceView()) return;
           if (isAutoPlaying) stopAuto();
         });
         expShell.addEventListener("mouseleave", () => {
+          if (isMobileExperienceView()) return;
           if (isAutoPlaying) startAuto();
         });
         expShell.addEventListener("keydown", (event) => {
+          if (isMobileExperienceView()) return;
           if (event.key === "ArrowLeft") goTo((currentIndex - 1 + expSlides.length) % expSlides.length, -1);
           if (event.key === "ArrowRight") goTo((currentIndex + 1) % expSlides.length, 1);
         });
@@ -2089,6 +2628,11 @@
         const resyncExperienceState = () => {
           stopAuto();
           isAnimating = false;
+          if (isMobileExperienceView()) {
+            setAutoState(false);
+            setMobileSlide(currentIndex);
+            return;
+          }
           const activeNode = expNodes.find((node) => node.classList.contains("is-active"));
           const derivedIndex = activeNode ? Number(activeNode.dataset.expIndex) : currentIndex;
           if (!Number.isNaN(derivedIndex)) currentIndex = derivedIndex;
@@ -2097,9 +2641,22 @@
           if (isAutoPlaying) startAuto();
         };
 
-        updateMeta();
-        normalizeSlides(currentIndex);
-        setAutoState(true);
+        let wasMobileView = isMobileExperienceView();
+        if (wasMobileView) {
+          setAutoState(false);
+          setMobileSlide(currentIndex);
+        } else {
+          updateMeta();
+          normalizeSlides(currentIndex);
+          setAutoState(true);
+        }
+
+        window.addEventListener("resize", () => {
+          const mobileNow = isMobileExperienceView();
+          if (mobileNow === wasMobileView) return;
+          wasMobileView = mobileNow;
+          resyncExperienceState();
+        });
 
         window.addEventListener("pageshow", () => {
           // Browsers may restore stale animation classes from cache; force a clean single-slide render.
