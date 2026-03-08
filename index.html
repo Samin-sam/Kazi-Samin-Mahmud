@@ -533,6 +533,14 @@
       100%{ box-shadow:var(--shadow); }
     }
     .exp-btn i{ margin-right:.35rem; }
+    .proj-shell.is-switching .proj-stage{
+      animation:projStagePulse .48s ease;
+    }
+    @keyframes projStagePulse{
+      0%{ box-shadow:var(--shadow); }
+      45%{ box-shadow:0 20px 54px color-mix(in srgb,var(--accent) 26%, transparent); }
+      100%{ box-shadow:var(--shadow); }
+    }
 
     @keyframes pointIn{
       from{ opacity:0; transform:translateX(-8px); }
@@ -600,7 +608,7 @@
         height:72px;
         font-size:.68rem;
       }
-      .proj-stage{ min-height:450px; }
+      .proj-stage{ min-height:520px; }
       .proj-title{ font-size:1.6rem; }
       .proj-num{ font-size:3.8rem; min-width:62px; }
       .proj-dot{ margin-left:6.3rem; }
@@ -900,7 +908,7 @@
     }
     .proj-stage{
       position:relative;
-      min-height:520px;
+      min-height:560px;
       border-radius:26px;
       overflow:hidden;
       background:linear-gradient(155deg, color-mix(in srgb, var(--bg-3) 30%, var(--card)), var(--card));
@@ -924,21 +932,22 @@
       padding:1.55rem 1.65rem 1.25rem;
       color:var(--text);
       opacity:0;
-      transform:translateX(48px) scale(.98);
+      transform:translateX(52px) translateY(8px) scale(.98);
       pointer-events:none;
-      transition:opacity .42s ease, transform .42s cubic-bezier(.2,.7,.2,1);
+      transition:opacity .5s ease, transform .5s cubic-bezier(.22,.75,.25,1);
       z-index:1;
+      will-change:transform, opacity;
     }
     .proj-panel.is-active{
       opacity:1;
-      transform:translateX(0) scale(1);
+      transform:translateX(0) translateY(0) scale(1);
       pointer-events:auto;
       z-index:2;
     }
-    .proj-panel.is-enter-left{ transform:translateX(-48px) scale(.98); }
-    .proj-panel.is-enter-right{ transform:translateX(48px) scale(.98); }
-    .proj-panel.is-leaving-left{ transform:translateX(-42px) scale(.98); opacity:0; }
-    .proj-panel.is-leaving-right{ transform:translateX(42px) scale(.98); opacity:0; }
+    .proj-panel.is-enter-left{ transform:translateX(-52px) translateY(8px) scale(.98); }
+    .proj-panel.is-enter-right{ transform:translateX(52px) translateY(8px) scale(.98); }
+    .proj-panel.is-leaving-left{ transform:translateX(-46px) translateY(-6px) scale(.98); opacity:0; }
+    .proj-panel.is-leaving-right{ transform:translateX(46px) translateY(-6px) scale(.98); opacity:0; }
     .proj-step{
       display:flex;
       align-items:center;
@@ -1607,7 +1616,7 @@
             <article class="proj-panel is-active" data-proj-index="0">
               <div class="proj-step"><span class="proj-num">1</span><h5 class="proj-title">Let Us Learn</h5></div>
               <div class="proj-dot"></div>
-              <p class="proj-desc">Developed wireframes, sprint plans, requirement analysis, and delivery roadmap for UNICEF Bangladesh (OoSCI) to support vulnerable children. Conducted UAT in remote areas to improve usability and adoption.</p>
+              <p class="proj-desc">Led product planning for UNICEF Bangladesh&apos;s OoSCI initiative by translating policy and field requirements into wireframes, sprint priorities, and an execution roadmap. Coordinated UAT in hard-to-reach communities, captured ground-level feedback from facilitators and learners, and refined onboarding, lesson flow, and reporting to improve usability, completion consistency, and local adoption.</p>
               <div class="project-tags">
                 <span class="project-tag">UNICEF</span><span class="project-tag">UAT</span><span class="project-tag">Social Impact</span>
               </div>
@@ -1616,7 +1625,7 @@
             <article class="proj-panel" data-proj-index="1">
               <div class="proj-step"><span class="proj-num">2</span><h5 class="proj-title">Trainr</h5></div>
               <div class="proj-dot"></div>
-              <p class="proj-desc">Designed and managed end-to-end development of a fitness app and authored PRDs for iOS, Android, and back-office admin panel for a global client.</p>
+              <p class="proj-desc">Directed end-to-end delivery of a fitness product ecosystem, including consumer mobile journeys and an operations-focused admin experience. Authored detailed PRDs for iOS, Android, and back-office modules, aligned design and engineering on release milestones, and structured feature rollout plans around engagement, retention, and content lifecycle management for a global client.</p>
               <div class="project-tags">
                 <span class="project-tag">PRD</span><span class="project-tag">Mobile</span><span class="project-tag">Global Client</span>
               </div>
@@ -1625,7 +1634,7 @@
             <article class="proj-panel" data-proj-index="2">
               <div class="proj-step"><span class="proj-num">3</span><h5 class="proj-title">Bdjobs Recruiter</h5></div>
               <div class="proj-dot"></div>
-              <p class="proj-desc">Reimagined the recruiter platform to improve engagement and satisfaction, introducing HR reporting dashboard, faster job posting flow, and AI Assessment in the hiring workflow.</p>
+              <p class="proj-desc">Reframed the Recruiter experience around recruiter speed and hiring quality by redesigning core workflows from job posting to candidate shortlisting. Shipped an HR reporting dashboard, streamlined high-friction posting steps, and introduced AI Assessment capabilities to strengthen screening confidence, shorten decision cycles, and increase platform stickiness for B2B hiring teams.</p>
               <div class="project-tags">
                 <span class="project-tag">B2B</span><span class="project-tag">AI Assessment</span><span class="project-tag">Dashboard</span>
               </div>
@@ -1634,7 +1643,7 @@
             <article class="proj-panel" data-proj-index="3">
               <div class="proj-step"><span class="proj-num">4</span><h5 class="proj-title">Bdjobs Job Fair</h5></div>
               <div class="proj-dot"></div>
-              <p class="proj-desc">Redesigned the panel and simplified user flow across B2B and B2C journeys; supported execution of more than six online and offline job fairs.</p>
+              <p class="proj-desc">Redesigned the Job Fair control panel and participant journeys to reduce friction across both employer-side (B2B) and candidate-side (B2C) flows. Supported planning and execution for 6+ hybrid job fairs, improved event setup and registration efficiency, and coordinated operational handoffs to keep campaigns consistent across online and offline touchpoints.</p>
               <div class="project-tags">
                 <span class="project-tag">B2B</span><span class="project-tag">B2C</span><span class="project-tag">User Flow</span>
               </div>
@@ -1643,7 +1652,7 @@
             <article class="proj-panel" data-proj-index="4">
               <div class="proj-step"><span class="proj-num">5</span><h5 class="proj-title">Bdjobs E-learning</h5></div>
               <div class="proj-dot"></div>
-              <p class="proj-desc">Managed core platform improvements and competitive enhancements while collaborating with 10 Minute School and Wadwani Foundation to improve job-market readiness.</p>
+              <p class="proj-desc">Owned platform enhancement priorities for the E-learning vertical, balancing learner engagement improvements with commercial and partnership goals. Collaborated with 10 Minute School and Wadwani Foundation on employability-focused content initiatives, strengthened course-discovery and progression flows, and supported growth with feature updates aligned to job-market readiness outcomes.</p>
               <div class="project-tags">
                 <span class="project-tag">E-learning</span><span class="project-tag">Partnerships</span><span class="project-tag">Platform Growth</span>
               </div>
@@ -1652,7 +1661,7 @@
             <article class="proj-panel" data-proj-index="5">
               <div class="proj-step"><span class="proj-num">6</span><h5 class="proj-title">Gamestar</h5></div>
               <div class="proj-dot"></div>
-              <p class="proj-desc">Delivered a subscription-based live gaming portal where users join and compete through a bKash-integrated payment experience.</p>
+              <p class="proj-desc">Built and launched a subscription-led live gaming portal with real-time participation mechanics and recurring engagement loops. Designed the monetization flow around bKash integration for faster checkout and payment reliability, while coordinating gameplay, subscription, and support workflows to keep the experience stable during peak participation windows.</p>
               <div class="project-tags">
                 <span class="project-tag">Gaming</span><span class="project-tag">Subscription</span><span class="project-tag">bKash</span>
               </div>
@@ -1661,7 +1670,7 @@
             <article class="proj-panel" data-proj-index="6">
               <div class="proj-step"><span class="proj-num">7</span><h5 class="proj-title">Quizmaster</h5></div>
               <div class="proj-dot"></div>
-              <p class="proj-desc">Built a live quiz platform with subscription mechanics where users participate and earn rewards, integrated with bKash for monetization.</p>
+              <p class="proj-desc">Developed a live quiz platform that combined competitive gameplay, reward mechanics, and subscription monetization into a single user journey. Integrated bKash payments to support scalable recurring access, refined round logic and participant flow for smoother sessions, and improved retention through clearer progression cues and reward visibility.</p>
               <div class="project-tags">
                 <span class="project-tag">Quiz</span><span class="project-tag">Monetization</span><span class="project-tag">bKash</span>
               </div>
@@ -2097,12 +2106,25 @@
         if (!projDeck || !projTabs.length || !projPanels.length) return;
         let activeIndex = 0;
         let isSwitching = false;
+        let pendingIndex = null;
+
+        const getDirection = (fromIndex, toIndex) => {
+          const total = projPanels.length;
+          const forward = (toIndex - fromIndex + total) % total;
+          const backward = (fromIndex - toIndex + total) % total;
+          return forward <= backward ? 1 : -1;
+        };
 
         const setActive = (nextIndex) => {
-          if (isSwitching || nextIndex === activeIndex) return;
+          if (nextIndex === activeIndex) return;
+          if (isSwitching) {
+            pendingIndex = nextIndex;
+            return;
+          }
           isSwitching = true;
+          projDeck.classList.add("is-switching");
 
-          const direction = nextIndex > activeIndex ? 1 : -1;
+          const direction = getDirection(activeIndex, nextIndex);
           const currentPanel = projPanels[activeIndex];
           const nextPanel = projPanels[nextIndex];
 
@@ -2124,7 +2146,15 @@
               tab.setAttribute("aria-selected", on ? "true" : "false");
             });
             isSwitching = false;
-          }, 430);
+            projDeck.classList.remove("is-switching");
+            if (pendingIndex !== null && pendingIndex !== activeIndex) {
+              const queued = pendingIndex;
+              pendingIndex = null;
+              setActive(queued);
+            } else {
+              pendingIndex = null;
+            }
+          }, 500);
         };
 
         projTabs.forEach((tab) => {
