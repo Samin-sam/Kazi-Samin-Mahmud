@@ -15,10 +15,10 @@
 
   <style>
     :root{
-      --primary:#ff6a3d;
-      --primary-strong:#e5542d;
-      --secondary:#0ea5a4;
-      --secondary-strong:#0b8d8c;
+      --primary:#2563eb;
+      --primary-strong:#1d4ed8;
+      --secondary:#06b6d4;
+      --secondary-strong:#0891b2;
 
       --bg:#f7f6f3;
       --bg-2:#ffffff;
@@ -35,15 +35,15 @@
 
       --accent:var(--primary);
       --accent-2:var(--primary-strong);
-      --accent-soft:#ffc0ad;
+      --accent-soft:#bfdbfe;
       --cta:var(--secondary);
       --cta-2:var(--secondary-strong);
 
-      --headline-gradient: linear-gradient(90deg,#e5542d 0%, #ff6a3d 45%, #f59e0b 100%);
+      --headline-gradient: linear-gradient(90deg,#1d4ed8 0%, #2563eb 45%, #06b6d4 100%);
 
-      --blobA: rgba(255,106,61,.24);
+      --blobA: rgba(37,99,235,.24);
       --blobB: rgba(14,165,164,.18);
-      --hero-bg: radial-gradient(1200px 600px at -10% -10%, #fff1eb 0%, transparent 62%);
+      --hero-bg: radial-gradient(1200px 600px at -10% -10%, #eaf2ff 0%, transparent 62%);
 
       --progress-start:var(--primary);
       --progress-end:var(--secondary);
@@ -58,10 +58,10 @@
     }
 
     html[data-theme="dark"]{
-      --primary:#ff8a66;
-      --primary-strong:#ff6d45;
-      --secondary:#1bc4bf;
-      --secondary-strong:#13a79f;
+      --primary:#60a5fa;
+      --primary-strong:#3b82f6;
+      --secondary:#22d3ee;
+      --secondary-strong:#06b6d4;
 
       --bg:#0f1113;
       --bg-2:#14181d;
@@ -78,16 +78,16 @@
 
       --accent:var(--primary);
       --accent-2:var(--primary-strong);
-      --accent-soft:#ffb89f;
+      --accent-soft:#93c5fd;
 
-      --headline-gradient: linear-gradient(90deg,#ff9f83 0%, #ff805f 45%, #ffc062 100%);
+      --headline-gradient: linear-gradient(90deg,#93c5fd 0%, #60a5fa 45%, #22d3ee 100%);
 
       --cta:var(--secondary);
       --cta-2:var(--secondary-strong);
 
-      --blobA: rgba(255,138,102,.22);
+      --blobA: rgba(96,165,250,.24);
       --blobB: rgba(27,196,191,.18);
-      --hero-bg: radial-gradient(1100px 560px at -10% -10%, rgba(255,138,102,.11) 0%, transparent 62%);
+      --hero-bg: radial-gradient(1100px 560px at -10% -10%, rgba(96,165,250,.13) 0%, transparent 62%);
       --progress-start:var(--primary);
       --progress-end:var(--secondary);
       --chip:#242b34;
@@ -566,11 +566,15 @@
       .exp-node{ min-width:220px; }
       .proj-shell{ grid-template-columns:1fr; }
       .skill-view{ grid-template-columns:1fr; }
-      .contact-shell{ grid-template-columns:1fr; min-height:auto; }
+      .contact-shell{ grid-template-columns:1fr; min-height:auto; gap:.9rem; }
       .contact-side{ min-height:300px; padding:1.6rem 1.2rem 1.5rem; }
       .contact-side p{ font-size:1rem; max-width:100%; }
       .contact-art{ width:56%; right:-16px; bottom:-26px; }
-      .contact-form-card{ padding:1rem; }
+      .contact-form-card{
+        padding:1rem;
+        margin:-1.15rem .7rem .7rem;
+        border-radius:24px;
+      }
       .service-item.featured,
       .service-item.standard{ grid-column:span 12; }
       .proj-rail{
@@ -1118,13 +1122,13 @@
     .contact-shell{
       display:grid;
       grid-template-columns:1.15fr .9fr;
-      gap:0;
+      gap:1.2rem;
       border-radius:30px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
+      overflow:visible;
+      box-shadow:none;
       min-height:520px;
-      border:1px solid var(--border);
-      background:var(--card);
+      border:none;
+      background:transparent;
     }
     .contact-side{
       background:linear-gradient(
@@ -1133,10 +1137,12 @@
         var(--accent) 48%,
         color-mix(in srgb,var(--accent) 72%, #f59e0b) 100%
       );
-      color:var(--on-primary);
+      color:#fff;
       padding:2.4rem 2.2rem 1.6rem;
       position:relative;
       overflow:hidden;
+      border-radius:30px;
+      box-shadow:var(--shadow);
     }
     .contact-side::before{
       content:"";
@@ -1150,11 +1156,11 @@
       font-size:clamp(2rem,3.8vw,3.3rem);
       line-height:1.02;
       margin:0 0 .9rem;
-      color:var(--on-primary);
+      color:#fff;
       max-width:530px;
     }
     .contact-side p{
-      color:color-mix(in srgb,var(--on-primary) 78%, transparent);
+      color:color-mix(in srgb,#fff 88%, transparent);
       max-width:520px;
       font-size:1.12rem;
       line-height:1.45;
@@ -1196,11 +1202,31 @@
       opacity:.85;
     }
     .contact-form-card{
-      background:var(--panel-inverse);
+      background:linear-gradient(145deg, color-mix(in srgb,var(--panel-inverse) 92%, #06090f), var(--panel-inverse));
       color:var(--text-inverse);
-      padding:1.3rem;
+      padding:1.2rem;
       display:flex;
       align-items:center;
+      border-radius:30px;
+      border:1px solid color-mix(in srgb,var(--muted-inverse) 24%, transparent);
+      box-shadow:0 28px 56px rgba(2,6,14,.46), 0 10px 24px rgba(2,6,14,.34);
+      margin:1.25rem 1.25rem 1.25rem -3.4rem;
+      position:relative;
+      z-index:4;
+    }
+    .contact-form-card::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:inherit;
+      pointer-events:none;
+      background:linear-gradient(145deg, color-mix(in srgb,var(--accent) 24%, transparent), transparent 40%);
+      opacity:.45;
+      mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite:exclude;
+      -webkit-mask-composite:xor;
+      padding:1px;
     }
     .contact-form-card form{
       width:100%;
@@ -1312,7 +1338,7 @@
             </h1>
             <div class="d-flex chips mt-3">
               <span class="chip"><i class="bi bi-geo-alt me-2"></i>Dhaka, Bangladesh</span>
-              <span class="chip"><i class="bi bi-briefcase me-2"></i>3+ yrs experience</span>
+              <span class="chip"><i class="bi bi-briefcase me-2"></i>4+ yrs experience</span>
               <span class="chip"><i class="bi bi-bar-chart-line me-2"></i>Data-informed decisions</span>
             </div>
           </div>
