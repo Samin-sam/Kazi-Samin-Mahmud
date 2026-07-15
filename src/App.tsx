@@ -1,7 +1,4 @@
 import { FormEvent, type MouseEvent as ReactMouseEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { motion, useScroll, useTransform, type Transition } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowUpRight,
   Award,
@@ -18,8 +15,8 @@ import {
   LucideIcon,
   Mail,
   MapPin,
+  Menu,
   MessageSquare,
-  MousePointer2,
   Rocket,
   Search,
   Send,
@@ -27,10 +24,9 @@ import {
   Sparkles,
   Target,
   Users,
-  Workflow
+  Workflow,
+  X
 } from "lucide-react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 type FormState = {
   name: string;
@@ -323,109 +319,25 @@ const certifications = [
   "Explore a Career in Product Management - LinkedIn Learning Path"
 ];
 
-const smoothEase = [0.22, 1, 0.36, 1] as const;
-const fadeEase = [0.25, 0.1, 0.25, 1] as const;
-const fadeTransition: Transition = { duration: 0.45, ease: smoothEase };
-const revealViewport = { once: true, amount: 0.12 } as const;
-const revealDelay = (index: number) => Math.min(index * 0.04, 0.16);
-
-const fadeUp = {
-  initial: { opacity: 0, y: 22 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: revealViewport,
-  transition: fadeTransition
-};
-
 function useGsapEnhancements() {
   useEffect(() => {
-    const media = gsap.matchMedia();
+    const canTilt = window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
+    const stage = document.querySelector<HTMLElement>(".hero-portrait-stage");
+    const floatingLayer = stage?.querySelector<HTMLElement>(".hero-portrait-float");
+    if (!canTilt.matches || !stage || !floatingLayer) return;
 
-    media.add("(prefers-reduced-motion: no-preference)", () => {
-      const hero = document.querySelector<HTMLElement>("#top");
-      const portraitOrbit = hero?.querySelector<HTMLElement>(".hero-portrait-orbit");
-      const portraitImage = hero?.querySelector<HTMLElement>(".hero-portrait-image");
-      const portraitBob = hero?.querySelector<HTMLElement>(".hero-portrait-bob");
+    let active = true;
+    let isInitialized = false;
+    let removeTiltListeners: (() => void) | undefined;
 
-      if (hero && portraitOrbit && portraitImage) {
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: hero,
-              start: "top top",
-              end: "bottom top",
-              scrub: true,
-              invalidateOnRefresh: true
-            }
-          })
-          .to(portraitOrbit, { rotation: 4, ease: "none" }, 0)
-          .to(portraitImage, { yPercent: 2.5, scale: 1.12, ease: "none" }, 0);
-      }
+    const initializeTilt = async () => {
+      if (isInitialized) return;
+      isInitialized = true;
 
-      if (hero && portraitBob) {
-        gsap.to(portraitBob, {
-          y: -5,
-          duration: 2.8,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          scrollTrigger: {
-            trigger: hero,
-            start: "top bottom",
-            end: "bottom top",
-            toggleActions: "play pause resume pause"
-          }
-        });
-      }
+      const { gsap } = await import("gsap");
+      if (!active) return;
 
-      gsap.utils.toArray<HTMLElement>(".expertise-number").forEach((number) => {
-        gsap.fromTo(
-          number,
-          { x: -8 },
-          {
-            x: 8,
-            ease: "none",
-            scrollTrigger: {
-              trigger: number.closest("article") ?? number,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-              invalidateOnRefresh: true
-            }
-          }
-        );
-      });
-    });
-
-    media.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
-      gsap.utils.toArray<HTMLElement>(".project-grid-card").forEach((card) => {
-        const glow = card.querySelector<HTMLElement>(".case-visual-glow");
-        if (!glow) return;
-
-        gsap.fromTo(
-          glow,
-          { yPercent: -8, rotation: -6 },
-          {
-            yPercent: 8,
-            rotation: 6,
-            ease: "none",
-            scrollTrigger: {
-              trigger: card,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-              invalidateOnRefresh: true
-            }
-          }
-        );
-      });
-    });
-
-    media.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
-      const stage = document.querySelector<HTMLElement>(".hero-portrait-stage");
-      const floatingLayer = stage?.querySelector<HTMLElement>(".hero-portrait-float");
-      if (!stage || !floatingLayer) return;
-
-      let bounds: DOMRect | null = null;
+      let bounds = stage.getBoundingClientRect();
       const moveX = gsap.quickTo(floatingLayer, "x", { duration: 0.45, ease: "power3.out" });
       const moveY = gsap.quickTo(floatingLayer, "y", { duration: 0.45, ease: "power3.out" });
       const rotateX = gsap.quickTo(floatingLayer, "rotateX", { duration: 0.55, ease: "power3.out" });
@@ -438,9 +350,6 @@ function useGsapEnhancements() {
       };
 
       const handlePointerMove = (event: PointerEvent) => {
-        if (!bounds) updateBounds();
-        if (!bounds) return;
-
         const horizontal = (event.clientX - (bounds.left + bounds.width / 2)) / (bounds.width / 2);
         const vertical = (event.clientY - (bounds.top + bounds.height / 2)) / (bounds.height / 2);
 
@@ -451,158 +360,41 @@ function useGsapEnhancements() {
       };
 
       const resetPortrait = () => {
-        bounds = null;
         moveX(0);
         moveY(0);
         rotateX(0);
         rotateY(0);
       };
 
-      stage.addEventListener("pointerenter", updateBounds);
       stage.addEventListener("pointermove", handlePointerMove);
       stage.addEventListener("pointerleave", resetPortrait);
       window.addEventListener("resize", updateBounds);
 
-      return () => {
-        stage.removeEventListener("pointerenter", updateBounds);
+      removeTiltListeners = () => {
         stage.removeEventListener("pointermove", handlePointerMove);
         stage.removeEventListener("pointerleave", resetPortrait);
         window.removeEventListener("resize", updateBounds);
       };
-    });
-
-    ScrollTrigger.refresh();
-
-    return () => media.revert();
-  }, []);
-}
-
-function CustomCursor() {
-  const cursorRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const cursor = cursorRef.current;
-    const supportsCursor = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!cursor || !supportsCursor || reduceMotion) return;
-
-    const moveX = gsap.quickTo(cursor, "x", { duration: 0.18, ease: "power3.out" });
-    const moveY = gsap.quickTo(cursor, "y", { duration: 0.18, ease: "power3.out" });
-    let isVisible = false;
-
-    gsap.set(cursor, { xPercent: -50, yPercent: -50 });
-
-    const showCursor = () => {
-      if (isVisible) return;
-      isVisible = true;
-      gsap.to(cursor, { opacity: 1, duration: 0.2, overwrite: true });
     };
 
-    const hideCursor = () => {
-      isVisible = false;
-      cursor.classList.remove("is-interactive", "is-text", "is-pressed");
-      gsap.killTweensOf(cursor, "opacity");
-      gsap.set(cursor, { opacity: 0 });
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      if (
-        event.clientX <= 0 ||
-        event.clientY <= 0 ||
-        event.clientX >= window.innerWidth ||
-        event.clientY >= window.innerHeight
-      ) {
-        hideCursor();
-        return;
-      }
-
-      const x = event.clientX + 18;
-      const y = event.clientY + 18;
-
-      if (!isVisible) {
-        gsap.set(cursor, { x, y });
-        showCursor();
-        return;
-      }
-
-      moveX(x);
-      moveY(y);
-    };
-
-    const updateCursorState = (event: MouseEvent) => {
-      const target = event.target instanceof Element ? event.target : null;
-      cursor.classList.toggle("is-interactive", Boolean(target?.closest("a, button, [data-cursor-interactive]")));
-      cursor.classList.toggle("is-text", Boolean(target?.closest("input, textarea, [contenteditable='true']")));
-    };
-
-    const pressCursor = () => cursor.classList.add("is-pressed");
-    const releaseCursor = () => cursor.classList.remove("is-pressed");
-    const handleMouseOut = (event: MouseEvent) => {
-      if (!event.relatedTarget) hideCursor();
-    };
-    const handleVisibilityChange = () => {
-      if (document.hidden) hideCursor();
-    };
-
-    document.addEventListener("mousemove", handleMouseMove, { passive: true });
-    document.addEventListener("mouseover", updateCursorState, { passive: true });
-    document.addEventListener("mouseout", handleMouseOut, { passive: true });
-    document.addEventListener("mousedown", pressCursor, { passive: true });
-    document.addEventListener("mouseup", releaseCursor, { passive: true });
-    document.addEventListener("mouseleave", hideCursor);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("blur", hideCursor);
-    window.addEventListener("pagehide", hideCursor);
-    window.addEventListener("pointercancel", hideCursor);
+    stage.addEventListener("pointerenter", initializeTilt, { once: true });
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseover", updateCursorState);
-      document.removeEventListener("mouseout", handleMouseOut);
-      document.removeEventListener("mousedown", pressCursor);
-      document.removeEventListener("mouseup", releaseCursor);
-      document.removeEventListener("mouseleave", hideCursor);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("blur", hideCursor);
-      window.removeEventListener("pagehide", hideCursor);
-      window.removeEventListener("pointercancel", hideCursor);
-      gsap.killTweensOf(cursor);
+      active = false;
+      stage.removeEventListener("pointerenter", initializeTilt);
+      removeTiltListeners?.();
     };
   }, []);
-
-  return (
-    <div ref={cursorRef} className="custom-cursor" style={{ opacity: 0 }} aria-hidden="true">
-      <MousePointer2 className="custom-cursor-icon" />
-    </div>
-  );
 }
 
 function FadeIn({
   children,
-  className = "",
-  delay = 0,
-  duration = 0.45,
-  x = 0,
-  y = 20
+  className = ""
 }: {
   children: ReactNode;
   className?: string;
-  delay?: number;
-  duration?: number;
-  x?: number;
-  y?: number;
 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x, y }}
-      whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={revealViewport}
-      transition={{ duration, delay, ease: fadeEase }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 function Magnet({ children, className = "", strength = 0.22 }: { children: ReactNode; className?: string; strength?: number }) {
@@ -655,20 +447,20 @@ function ContactButton({
   if (href) {
     return (
       <Magnet>
-        <motion.a href={href} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className={classes}>
+        <a href={href} className={classes}>
           {children}
           {icon}
-        </motion.a>
+        </a>
       </Magnet>
     );
   }
 
   return (
     <Magnet>
-      <motion.button type={type} disabled={disabled} whileHover={{ scale: disabled ? 1 : 1.02 }} whileTap={{ scale: disabled ? 1 : 0.98 }} className={classes}>
+      <button type={type} disabled={disabled} className={classes}>
         {children}
         {icon}
-      </motion.button>
+      </button>
     </Magnet>
   );
 }
@@ -684,21 +476,50 @@ function GhostButton({
 }) {
   return (
     <Magnet>
-      <motion.a
+      <a
         href={href}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
         className={`inline-flex h-[56px] items-center justify-center rounded-full border border-[#D7E2EA] bg-transparent px-8 text-sm font-semibold uppercase tracking-widest text-[#D7E2EA] transition-all duration-300 hover:bg-[#D7E2EA]/10 ${className}`}
       >
         {children}
-      </motion.a>
+      </a>
     </Magnet>
   );
 }
 
+function ScrollProgressBar() {
+  const progressRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
+      if (progressRef.current) progressRef.current.style.transform = `scaleX(${progress})`;
+    };
+
+    const requestUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, []);
+
+  return <div ref={progressRef} aria-hidden="true" className="fixed left-0 top-0 z-50 h-1 w-full origin-left scale-x-0 bg-accent-gradient" />;
+}
+
 function App() {
   useGsapEnhancements();
-  const { scrollYProgress } = useScroll();
   const [form, setForm] = useState<FormState>({ name: "", email: "", subject: "", message: "" });
   const [validation, setValidation] = useState<FormErrors>({});
   const [status, setStatus] = useState<FormStatus>("idle");
@@ -750,9 +571,9 @@ function App() {
 
   return (
     <>
-      <CustomCursor />
-      <main className="min-h-screen overflow-x-clip bg-ink text-mist" style={spotlight}>
-        <motion.div className="fixed left-0 top-0 z-50 h-1 origin-left bg-accent-gradient" style={{ scaleX: scrollYProgress }} />
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+      <main id="main-content" className="min-h-screen overflow-x-clip bg-ink text-mist" style={spotlight}>
+        <ScrollProgressBar />
         <SiteHeader />
         <HeroSection />
         <MarqueeSection />
@@ -777,6 +598,7 @@ function App() {
 
 function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrolledRef = useRef(false);
 
   useEffect(() => {
@@ -793,24 +615,28 @@ function SiteHeader() {
     return () => window.removeEventListener("scroll", updateHeader);
   }, []);
 
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-40 border-b text-[#D7E2EA] transition-[background-color,border-color,box-shadow] duration-200 ${
-        isScrolled
+        isScrolled || isMenuOpen
           ? "border-white/10 bg-[#0C0C0C]/95 shadow-[0_10px_35px_rgba(0,0,0,0.35)]"
           : "border-transparent bg-transparent shadow-none"
       }`}
     >
-      <motion.nav
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.65, ease: smoothEase }}
-        className="flex items-center justify-between px-6 py-5 text-[0.68rem] font-medium uppercase tracking-wider sm:text-sm md:px-10 md:py-6 md:text-lg lg:text-[1.25rem]"
-      >
+      <nav className="flex items-center justify-between px-5 py-4 text-xs font-medium uppercase tracking-wider sm:px-6 sm:text-sm md:px-10 md:py-6 md:text-lg lg:text-[1.25rem]">
         <a href="#top" className="nav-underline whitespace-nowrap transition duration-200 hover:opacity-70">
           Kazi Samin Mahmud
         </a>
-        <div className="flex items-center gap-2 sm:gap-5 md:gap-8">
+        <div className="hidden items-center gap-5 md:flex md:gap-8">
           {navItems.map((item) => (
             <a
               key={item.href}
@@ -821,67 +647,79 @@ function SiteHeader() {
             </a>
           ))}
         </div>
-      </motion.nav>
+        <button
+          type="button"
+          className="flex h-10 items-center gap-2 rounded-full border border-white/20 bg-[#141414]/90 px-3 text-[.68rem] font-semibold tracking-[.14em] text-[#D7E2EA] shadow-[0_8px_24px_rgba(0,0,0,.28)] md:hidden"
+          aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-navigation"
+          onClick={() => setIsMenuOpen((current) => !current)}
+        >
+          <span>{isMenuOpen ? "Close" : "Menu"}</span>
+          {isMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+        </button>
+      </nav>
+
+      <div
+        id="mobile-navigation"
+        className={`grid overflow-hidden px-5 transition-[max-height,opacity,padding] duration-300 md:hidden ${
+          isMenuOpen ? "max-h-96 pb-5 opacity-100" : "max-h-0 pb-0 opacity-0"
+        }`}
+        aria-hidden={!isMenuOpen}
+        inert={!isMenuOpen}
+      >
+        {navItems.map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            onClick={() => setIsMenuOpen(false)}
+            className="border-t border-white/10 py-3 text-sm font-medium uppercase tracking-[.18em] text-[#D7E2EA]/75 transition hover:text-[#D7E2EA]"
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
     </header>
   );
 }
 
 function HeroSection() {
   return (
-    <section id="top" className="relative flex h-screen flex-col overflow-x-clip bg-[#0C0C0C]">
+    <section id="top" className="relative flex h-[100svh] min-h-[720px] flex-col overflow-x-clip bg-[#0C0C0C]">
       <div className="absolute inset-0 bg-grid opacity-20" />
       <div className="pointer-events-none absolute left-1/2 top-[52%] h-[48vw] max-h-[520px] w-[48vw] max-w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#B600A8]/20 blur-[90px]" />
       <div className="pointer-events-none absolute bottom-0 right-[8%] h-64 w-64 rounded-full bg-[#BE4C00]/15 blur-[80px]" />
 
-      <div className="relative z-20 mt-[86px] overflow-hidden px-6 sm:mt-[92px] md:mt-[104px] md:px-10">
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.15, ease: smoothEase }}
-          className="mt-6 w-full whitespace-nowrap text-[14vw] font-black uppercase leading-none tracking-tight text-gradient sm:mt-4 sm:text-[15vw] md:-mt-5 md:text-[15.5vw] lg:text-[16vw]"
-        >
-          Hi, i'm samin
-        </motion.h1>
+      <div className="relative z-20 mt-[76px] overflow-hidden px-5 sm:mt-[92px] sm:px-6 md:mt-[104px] md:px-10">
+        <h1 className="mt-4 w-full text-[17vw] font-black uppercase leading-[.82] tracking-tight text-gradient sm:mt-4 sm:whitespace-nowrap sm:text-[12.4vw] sm:leading-none md:-mt-3 md:text-[12.2vw] lg:text-[12vw]">
+          Hi, I'm <span className="block sm:inline">Samin</span>
+        </h1>
       </div>
 
       <HeroPortraitObject />
 
-      {heroChips.map((chip, index) => (
-        <motion.div
+      {heroChips.map((chip) => (
+        <div
           key={chip.label}
-          initial={{ opacity: 0, y: 16, scale: 0.94 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.55, delay: 0.75 + index * 0.08, ease: smoothEase }}
-          whileHover={{ y: -4, scale: 1.04 }}
-          className={`hero-chip absolute z-20 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-medium uppercase tracking-widest text-[#D7E2EA] backdrop-blur-md sm:text-xs ${chip.className}`}
+          className={`hero-chip absolute z-20 hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] font-medium uppercase tracking-widest text-[#D7E2EA] backdrop-blur-md sm:block sm:text-xs ${chip.className}`}
         >
           {chip.label}
-        </motion.div>
+        </div>
       ))}
 
-      <div className="relative z-20 mt-auto flex items-end justify-between gap-4 px-6 pb-7 sm:pb-8 md:px-10 md:pb-10">
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.35, ease: smoothEase }}
-          className="max-w-[180px] text-[clamp(0.75rem,1.4vw,1.5rem)] font-light uppercase leading-snug tracking-wide text-[#D7E2EA] sm:max-w-[240px] md:max-w-[300px]"
-        >
+      <div className="relative z-20 mt-auto flex flex-col items-start gap-4 px-5 pb-5 sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:pb-8 md:px-10 md:pb-10">
+        <p className="max-w-[230px] text-[clamp(0.72rem,1.4vw,1.5rem)] font-light uppercase leading-snug tracking-wide text-[#D7E2EA] sm:max-w-[240px] md:max-w-[300px]">
           a product manager building user-centered, data-driven digital products
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.5, ease: smoothEase }}
-          className="flex flex-col gap-3 sm:flex-row"
-        >
-          <ContactButton href="#projects" icon={<ArrowUpRight className="size-4" />} className="h-auto px-5 py-3 text-sm sm:px-6 sm:py-4">
+        <div className="flex flex-row gap-2 sm:gap-3">
+          <ContactButton href="#projects" icon={<ArrowUpRight className="size-4" />} className="h-auto px-4 py-3 text-[11px] sm:px-6 sm:py-4 sm:text-sm">
             View Projects
           </ContactButton>
-          <GhostButton href="#contact" className="h-auto border-[#D7E2EA]/25 bg-white/5 px-5 py-3 text-sm shadow-[0_0_35px_rgba(215,226,234,0.08)] backdrop-blur-md sm:px-6 sm:py-4">
+          <GhostButton href="#contact" className="h-auto border-[#D7E2EA]/25 bg-white/5 px-4 py-3 text-[11px] shadow-[0_0_35px_rgba(215,226,234,0.08)] backdrop-blur-md sm:px-6 sm:py-4 sm:text-sm">
             Contact Me
           </GhostButton>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -889,13 +727,8 @@ function HeroSection() {
 
 function HeroPortraitObject() {
   return (
-    <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 sm:bottom-0 sm:top-auto sm:translate-y-0">
-      <motion.figure
-        initial={{ opacity: 0, y: 24, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.65, delay: 0.45, ease: smoothEase }}
-        className="hero-portrait-stage"
-      >
+    <div className="absolute left-1/2 top-[48%] z-10 -translate-x-1/2 -translate-y-1/2 sm:bottom-0 sm:top-auto sm:translate-y-0">
+      <figure className="hero-portrait-stage">
         <div className="hero-portrait-float">
           <div className="hero-portrait-bob">
             <div className="hero-portrait-glow" aria-hidden="true" />
@@ -906,10 +739,12 @@ function HeroPortraitObject() {
 
             <div className="hero-portrait-frame">
               <img
-                src="/My-Image.jpg"
+                src="/My-Image-640.jpg"
+                srcSet="/My-Image-640.jpg 640w, /My-Image-960.jpg 960w"
+                sizes="(min-width: 640px) 500px, 285px"
                 alt="Kazi Samin Mahmud"
-                width="1152"
-                height="1556"
+                width="640"
+                height="864"
                 fetchPriority="high"
                 decoding="async"
                 className="hero-portrait-image"
@@ -926,7 +761,7 @@ function HeroPortraitObject() {
             </div>
           </div>
         </div>
-      </motion.figure>
+      </figure>
     </div>
   );
 }
@@ -1015,61 +850,44 @@ function MarqueeTile({ children }: { children: ReactNode }) {
 }
 
 function AboutSection() {
-  const aboutRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: aboutRef,
-    offset: ["start 70%", "center 38%"]
-  });
-  const textOpacity = useTransform(scrollYProgress, [0, 0.65], [0.35, 1]);
-  const textY = useTransform(scrollYProgress, [0, 0.65], [14, 0]);
-
   return (
     <section
-      ref={aboutRef}
       id="about"
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0C0C0C] px-5 py-20 text-[#D7E2EA] sm:px-8 md:px-10"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(182,0,168,0.18),transparent_28%),radial-gradient(circle_at_82%_72%,rgba(190,76,0,0.14),transparent_30%)]" />
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#B600A8]/10 blur-[110px]" />
 
-      {aboutCards.map((card, index) => {
+      {aboutCards.map((card) => {
         const Icon = card.icon;
         return (
-          <motion.div
+          <div
             key={card.title}
-            initial={{ opacity: 0, y: 24, scale: 0.94 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={revealViewport}
-            transition={{ duration: 0.45, delay: revealDelay(index), ease: smoothEase }}
-            whileHover={{ scale: 1.04, y: -6 }}
-            className={`absolute z-10 hidden w-[176px] rounded-[32px] border border-[#D7E2EA]/15 bg-white/5 p-6 text-center shadow-[0_0_60px_rgba(182,0,168,0.15)] backdrop-blur-md md:block ${card.className}`}
+            className={`absolute z-10 hidden w-[176px] rounded-[32px] border border-[#D7E2EA]/15 bg-white/5 p-6 text-center shadow-[0_0_60px_rgba(182,0,168,0.15)] backdrop-blur-md transition-transform duration-300 hover:-translate-y-1.5 hover:scale-[1.04] md:block ${card.className}`}
           >
             <Icon className="mx-auto size-8 text-[#BBCCD7]" />
             <p className="mt-4 text-sm font-medium uppercase tracking-[.24em] text-[#D7E2EA]">{card.title}</p>
-          </motion.div>
+          </div>
         );
       })}
 
-      <motion.div {...fadeUp} className="relative z-20 mx-auto flex max-w-5xl flex-col items-center text-center">
+      <div className="relative z-20 mx-auto flex max-w-5xl flex-col items-center text-center">
         <div className="overflow-hidden">
           <h2 className="text-center text-[clamp(3rem,12vw,160px)] font-black uppercase leading-none tracking-tight text-gradient">
             About me
           </h2>
         </div>
 
-        <motion.p
-          style={{ opacity: textOpacity, y: textY }}
-          className="mt-10 max-w-[680px] text-center text-[clamp(1rem,2vw,1.35rem)] font-medium leading-relaxed text-[#D7E2EA]"
-        >
+        <p className="mt-10 max-w-[680px] text-center text-[clamp(1rem,2vw,1.35rem)] font-medium leading-relaxed text-[#D7E2EA]">
           {aboutText}
-        </motion.p>
+        </p>
 
         <div className="mt-10">
           <ContactButton href="#contact" className="h-auto px-7 py-4 text-sm">
           Contact Me
           </ContactButton>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
@@ -1081,24 +899,17 @@ function ExpertiseSection() {
       className="rounded-t-[40px] bg-white px-5 py-20 text-[#0C0C0C] sm:rounded-t-[50px] sm:px-8 sm:py-24 md:rounded-t-[60px] md:px-10 md:py-32"
     >
       <div className="mx-auto max-w-7xl">
-        <motion.h2
-          {...fadeUp}
-          className="mb-16 text-center text-[clamp(3rem,12vw,160px)] font-black uppercase leading-none tracking-tight text-[#0C0C0C] sm:mb-20 md:mb-28"
-        >
+        <h2 className="mb-16 text-center text-[clamp(3rem,12vw,160px)] font-black uppercase leading-none tracking-tight text-[#0C0C0C] sm:mb-20 md:mb-28">
           Expertise
-        </motion.h2>
+        </h2>
 
         <div className="mx-auto max-w-5xl">
-          {expertise.map((item, index) => (
-            <motion.article
+          {expertise.map((item) => (
+            <article
               key={item.number}
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={revealViewport}
-              transition={{ duration: 0.45, delay: revealDelay(index), ease: smoothEase }}
               className="grid gap-5 border-b border-[rgba(12,12,12,0.15)] py-8 sm:py-10 md:grid-cols-[.32fr_.68fr] md:gap-10 md:py-12"
             >
-              <div className="expertise-number text-[clamp(3rem,10vw,140px)] font-black uppercase leading-none text-[#0C0C0C]">
+              <div className="text-[clamp(3rem,10vw,140px)] font-black uppercase leading-none text-[#0C0C0C]">
                 {item.number}
               </div>
               <div className="flex flex-col justify-center">
@@ -1109,7 +920,7 @@ function ExpertiseSection() {
                   {item.body}
                 </p>
               </div>
-            </motion.article>
+            </article>
           ))}
         </div>
       </div>
@@ -1120,23 +931,15 @@ function ExpertiseSection() {
 function ExperienceSection() {
   return (
     <section id="experience" className="bg-[#0C0C0C] px-5 py-20 sm:px-8 sm:py-24 md:px-10 md:py-32">
-      <motion.h2
-        {...fadeUp}
-        className="mx-auto max-w-7xl text-center text-[clamp(3rem,12vw,160px)] font-black uppercase leading-none tracking-tight text-gradient"
-      >
+      <h2 className="mx-auto max-w-7xl text-center text-[clamp(3rem,12vw,160px)] font-black uppercase leading-none tracking-tight text-gradient">
         Experience
-      </motion.h2>
+      </h2>
 
       <div className="mx-auto mt-14 grid max-w-7xl gap-6 sm:mt-16 md:mt-20">
         {experience.map((item, index) => (
-          <motion.article
+          <article
             key={item.company}
-            initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={revealViewport}
-            transition={{ duration: 0.45, delay: revealDelay(index), ease: smoothEase }}
-            whileHover={{ y: -4 }}
-            className="experience-card group relative overflow-hidden rounded-[32px] border border-[#D7E2EA]/15 bg-white/5 p-6 shadow-glass transition-all duration-300 hover:bg-white/[0.07] sm:rounded-[40px] sm:p-8 md:p-10"
+            className="experience-card group relative overflow-hidden rounded-[32px] border border-[#D7E2EA]/15 bg-white/5 p-6 shadow-glass transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.07] sm:rounded-[40px] sm:p-8 md:p-10"
           >
             <div className="relative z-10 grid items-start gap-8 lg:grid-cols-[minmax(300px,.36fr)_minmax(0,.64fr)] lg:gap-10 xl:gap-14">
               <div>
@@ -1167,7 +970,7 @@ function ExperienceSection() {
                 ))}
               </ul>
             </div>
-          </motion.article>
+          </article>
         ))}
       </div>
     </section>
@@ -1184,7 +987,7 @@ function ProjectsSection() {
       <div className="pointer-events-none absolute inset-0 bg-grid opacity-[0.08]" />
 
       <div className="relative mx-auto max-w-7xl">
-        <motion.div {...fadeUp} className="grid gap-8 border-b border-white/10 pb-10 md:grid-cols-[1fr_.52fr] md:items-end md:pb-14">
+        <div className="grid gap-8 border-b border-white/10 pb-10 md:grid-cols-[1fr_.52fr] md:items-end md:pb-14">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 text-xs font-medium uppercase tracking-[.24em] text-[#D7E2EA]/60">
               <Sparkles className="size-4" />
@@ -1205,7 +1008,7 @@ function ProjectsSection() {
               <span>2022 - Present</span>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-7 md:mt-10">
           {projects.map((project, index) => (
@@ -1253,13 +1056,7 @@ function ProjectCard({
   index: number;
 }) {
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={revealViewport}
-      transition={{ duration: 0.45, delay: revealDelay(index), ease: smoothEase }}
-      className="project-grid-card group flex h-full flex-col overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.035] sm:rounded-[36px]"
-    >
+    <article className="project-grid-card group flex h-full flex-col overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.035] sm:rounded-[36px]">
       <div className="relative border-b border-white/10 p-3 sm:p-4">
         <ProductCaseVisual visual={visual} />
         <span className="absolute left-6 top-6 z-20 rounded-full border border-white/15 bg-[#0C0C0C]/85 px-3 py-2 text-xs font-semibold tracking-[.2em] text-[#D7E2EA]/75 shadow-lg sm:left-7 sm:top-7">
@@ -1322,7 +1119,7 @@ function ProjectCard({
           </a>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
@@ -1376,39 +1173,33 @@ function SkillsSection() {
       id="skills"
       className="-mt-10 rounded-t-[40px] bg-white px-5 py-20 text-[#0C0C0C] sm:-mt-12 sm:rounded-t-[50px] sm:px-8 sm:py-24 md:-mt-14 md:rounded-t-[60px] md:px-10 md:py-32"
     >
-      <motion.div {...fadeUp} className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl">
         <h2 className="text-center text-[clamp(3rem,12vw,160px)] font-black uppercase leading-none tracking-tight text-[#0C0C0C]">
           Skills
         </h2>
         <div className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 md:mt-20 md:grid-cols-2">
-          {skills.map((group, index) => (
-            <motion.article
+          {skills.map((group) => (
+            <article
               key={group.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={revealViewport}
-              transition={{ duration: 0.45, delay: revealDelay(index), ease: smoothEase }}
-              whileHover={{ y: -8 }}
-              className="min-h-[320px] rounded-[32px] border border-black/10 bg-[#F5F5F5] p-8 transition duration-300 sm:rounded-[40px] sm:p-10"
+              className="min-h-[320px] rounded-[32px] border border-black/10 bg-[#F5F5F5] p-8 transition-transform duration-300 hover:-translate-y-2 sm:rounded-[40px] sm:p-10"
             >
               <h3 className="text-[clamp(1.5rem,3vw,2.5rem)] font-black uppercase leading-tight tracking-tight text-[#0C0C0C]">
                 {group.title}
               </h3>
               <div className="mt-8 flex flex-wrap gap-3">
                 {group.items.map((item) => (
-                  <motion.span
+                  <span
                     key={item}
-                    whileHover={{ y: -3 }}
-                    className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-light text-[#0C0C0C] transition sm:text-base"
+                    className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-light text-[#0C0C0C] transition-transform duration-200 hover:-translate-y-0.5 sm:text-base"
                   >
                     {item}
-                  </motion.span>
+                  </span>
                 ))}
               </div>
-            </motion.article>
+            </article>
           ))}
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
@@ -1416,21 +1207,14 @@ function SkillsSection() {
 function CertificationsSection() {
   return (
     <section id="certifications" className="bg-[#0C0C0C] px-5 py-20 sm:px-8 sm:py-24 md:px-10 md:py-32">
-      <motion.h2
-        {...fadeUp}
-        className="mx-auto max-w-7xl text-center text-[clamp(3rem,12vw,160px)] font-black uppercase leading-none tracking-tight text-gradient"
-      >
+      <h2 className="mx-auto max-w-7xl text-center text-[clamp(3rem,12vw,160px)] font-black uppercase leading-none tracking-tight text-gradient">
         Learning
-      </motion.h2>
+      </h2>
 
       <div className="mx-auto mt-14 max-w-5xl sm:mt-16 md:mt-20">
         {certifications.map((item, index) => (
-          <motion.article
+          <article
             key={item}
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={revealViewport}
-            transition={{ duration: 0.45, delay: revealDelay(index), ease: smoothEase }}
             className="grid gap-4 border-b border-[#D7E2EA]/15 py-6 transition-all duration-300 hover:bg-white/[0.03] sm:grid-cols-[92px_1fr_auto] sm:items-center sm:gap-6 sm:py-8"
           >
             <span className="text-3xl font-black uppercase leading-none text-[#D7E2EA]/45 sm:text-4xl">
@@ -1443,7 +1227,7 @@ function CertificationsSection() {
               <Award className="size-4" />
               Certificate
             </span>
-          </motion.article>
+          </article>
         ))}
       </div>
     </section>
@@ -1476,7 +1260,7 @@ function ContactSection({
       </FadeIn>
 
       <div className="relative z-10 mx-auto mt-14 grid max-w-7xl gap-8 lg:grid-cols-[.88fr_1.12fr] lg:items-stretch">
-        <motion.div {...fadeUp} className="contact-left-panel relative min-h-[560px] overflow-hidden rounded-[32px] border border-white/10 p-7 text-white shadow-[0_0_90px_rgba(182,0,168,0.18)] sm:rounded-[40px] sm:p-9 md:p-10">
+        <div className="contact-left-panel relative min-h-[560px] overflow-hidden rounded-[32px] border border-white/10 p-7 text-white shadow-[0_0_90px_rgba(182,0,168,0.18)] sm:rounded-[40px] sm:p-9 md:p-10">
           <div className="contact-orb orb-a" />
           <div className="contact-orb orb-b" />
           <div className="contact-shape shape-a" />
@@ -1519,7 +1303,7 @@ function ContactSection({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         <ContactForm
           form={form}
@@ -1547,7 +1331,7 @@ function ContactForm({
   handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 }) {
   return (
-    <motion.form {...fadeUp} onSubmit={handleSubmit} className="contact-form-panel grid content-center gap-5 rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:rounded-[40px] sm:p-8 md:p-10">
+    <form onSubmit={handleSubmit} noValidate aria-label="Contact form" className="contact-form-panel grid content-center gap-5 rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:rounded-[40px] sm:p-8 md:p-10">
       <div>
         <p className="text-sm font-medium uppercase tracking-[.24em] text-[#D7E2EA]/45">Contact Form</p>
         <h3 className="mt-3 text-[clamp(2rem,4vw,4rem)] font-black uppercase leading-none tracking-tight text-[#D7E2EA]">
@@ -1580,17 +1364,20 @@ function ContactForm({
         error={validation.subject}
         onChange={(value) => setForm((current) => ({ ...current, subject: value }))}
       />
-      <label className="block">
+      <label className="block" htmlFor="message">
         <span className="mb-2 block text-sm font-medium text-[#D7E2EA]/60">Your Message</span>
         <textarea
           name="message"
+          id="message"
           value={form.message}
           onChange={(event) => setForm((current) => ({ ...current, message: event.target.value }))}
           rows={6}
           className="min-h-[160px] w-full resize-y rounded-2xl border border-white/10 bg-[#101318] px-5 py-4 text-[#D7E2EA] outline-none transition-all duration-300 placeholder:text-[#D7E2EA]/50 focus:border-[#B600A8]/70 focus:shadow-[0_0_35px_rgba(182,0,168,0.22)]"
           placeholder="Your Message"
+          aria-invalid={Boolean(validation.message)}
+          aria-describedby={validation.message ? "message-error" : undefined}
         />
-        {validation.message ? <span className="mt-2 block text-sm text-[#BBCCD7]">{validation.message}</span> : null}
+        {validation.message ? <span id="message-error" role="alert" className="mt-2 block text-sm text-[#BBCCD7]">{validation.message}</span> : null}
       </label>
 
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -1602,8 +1389,10 @@ function ContactForm({
         </GhostButton>
       </div>
 
-      {status === "sent" ? <p className="text-mist/70">Message sent successfully. I will get back to you soon.</p> : null}
-      {status === "error" ? <p className="text-[#BBCCD7]">Something went wrong. Please email me directly.</p> : null}
+      <div aria-live="polite">
+        {status === "sent" ? <p className="text-mist/70">Message sent successfully. I will get back to you soon.</p> : null}
+        {status === "error" ? <p role="alert" className="text-[#BBCCD7]">Something went wrong. Please email me directly.</p> : null}
+      </div>
 
       <div className="grid gap-3 border-t border-white/10 pt-5 text-sm text-[#D7E2EA]/58 sm:grid-cols-2">
         <div className="flex items-center gap-3">
@@ -1615,17 +1404,17 @@ function ContactForm({
           <span>Open to product, SaaS, AI, MVAS, and platform roles</span>
         </div>
       </div>
-    </motion.form>
+    </form>
   );
 }
 
 function MinimalFooter() {
   return (
-    <footer className="bg-[#0C0C0C] border-t border-white/10 px-5 py-10 text-[#D7E2EA]/55 sm:px-8 md:px-10">
+    <footer className="border-t border-white/10 bg-[#0C0C0C] px-5 py-10 text-[#D7E2EA]/70 sm:px-8 md:px-10">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xl font-semibold text-[#D7E2EA]">Kazi Samin Mahmud</p>
-          <p className="mt-1 text-sm uppercase tracking-widest text-[#D7E2EA]/45">Product Manager</p>
+          <p className="mt-1 text-sm uppercase tracking-widest text-[#D7E2EA]/65">Product Manager</p>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
           <a className="transition hover:text-[#D7E2EA]" href={`mailto:${contact.email}`}>
@@ -1682,18 +1471,25 @@ function InputField({
   error?: string;
   onChange: (value: string) => void;
 }) {
+  const errorId = `${name}-error`;
+  const autoComplete = name === "name" ? "name" : name === "email" ? "email" : "off";
+
   return (
-    <label className="block">
+    <label className="block" htmlFor={name}>
       <span className="mb-2 block text-sm font-medium text-[#D7E2EA]/60">{label}</span>
       <input
         name={name}
+        id={name}
         type={type}
         value={value}
+        autoComplete={autoComplete}
         onChange={(event) => onChange(event.target.value)}
         className="w-full rounded-2xl border border-white/10 bg-[#101318] px-5 py-4 text-[#D7E2EA] outline-none transition-all duration-300 placeholder:text-[#D7E2EA]/50 focus:border-[#B600A8]/70 focus:shadow-[0_0_35px_rgba(182,0,168,0.22)]"
         placeholder={label}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
       />
-      {error ? <span className="mt-2 block text-sm text-[#BBCCD7]">{error}</span> : null}
+      {error ? <span id={errorId} role="alert" className="mt-2 block text-sm text-[#BBCCD7]">{error}</span> : null}
     </label>
   );
 }
