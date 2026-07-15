@@ -38,6 +38,8 @@ type FormState = {
 type FormErrors = Partial<Record<keyof FormState, string>>;
 type FormStatus = "idle" | "sending" | "sent" | "error";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const contact = {
   email: "sammahmud362@gmail.com",
   linkedIn: "https://www.linkedin.com/in/saminmahmud",
@@ -535,7 +537,9 @@ function App() {
   const validate = () => {
     const next: FormErrors = {};
     if (!form.name.trim()) next.name = "Name is required.";
-    if (!form.email.trim()) next.email = "Email is required.";
+    const email = form.email.trim();
+    if (!email) next.email = "Email is required.";
+    else if (!EMAIL_PATTERN.test(email)) next.email = "Please enter a valid email address.";
     if (!form.subject.trim()) next.subject = "Subject is required.";
     if (!form.message.trim()) next.message = "Message is required.";
     setValidation(next);
