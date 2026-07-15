@@ -691,9 +691,7 @@ function HeroSection() {
       <div className="pointer-events-none absolute bottom-0 right-[8%] h-64 w-64 rounded-full bg-[#BE4C00]/15 blur-[80px]" />
 
       <div className="relative z-20 mt-[76px] overflow-hidden px-5 sm:mt-[92px] sm:px-6 md:mt-[104px] md:px-10">
-        <h1 className="mt-4 w-full text-[17vw] font-black uppercase leading-[.82] tracking-tight text-gradient sm:mt-4 sm:whitespace-nowrap sm:text-[12.4vw] sm:leading-none md:-mt-3 md:text-[12.2vw] lg:text-[12vw]">
-          Hi, I'm <span className="block sm:inline">Samin</span>
-        </h1>
+        <AnimatedHeroTitle />
       </div>
 
       <HeroPortraitObject />
@@ -722,6 +720,86 @@ function HeroSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+const heroTitle = "Hi, I'm Samin";
+const heroTitlePrefixLength = "Hi, I'm ".length;
+
+function useLoopingTypewriter(text: string) {
+  const [displayedText, setDisplayedText] = useState(text);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDisplayedText(text);
+      return;
+    }
+
+    let currentText = text;
+    let isDeleting = true;
+    let timeout = 0;
+
+    const tick = () => {
+      if (document.hidden) {
+        timeout = window.setTimeout(tick, 500);
+        return;
+      }
+
+      if (isDeleting) {
+        if (currentText.length > 0) {
+          currentText = currentText.slice(0, -1);
+          setDisplayedText(currentText);
+          timeout = window.setTimeout(tick, 55);
+          return;
+        }
+
+        isDeleting = false;
+        timeout = window.setTimeout(tick, 450);
+        return;
+      }
+
+      if (currentText.length < text.length) {
+        currentText = text.slice(0, currentText.length + 1);
+        setDisplayedText(currentText);
+        timeout = window.setTimeout(tick, 95);
+        return;
+      }
+
+      isDeleting = true;
+      timeout = window.setTimeout(tick, 1600);
+    };
+
+    timeout = window.setTimeout(tick, 1600);
+    return () => window.clearTimeout(timeout);
+  }, [text]);
+
+  return displayedText;
+}
+
+function AnimatedHeroTitle() {
+  const displayedText = useLoopingTypewriter(heroTitle);
+  const hasStartedName = displayedText.length > heroTitlePrefixLength;
+
+  return (
+    <h1
+      aria-label={heroTitle}
+      className="mt-4 min-h-[1.64em] w-full text-[17vw] font-black uppercase leading-[.82] tracking-tight text-gradient sm:mt-4 sm:min-h-[1em] sm:whitespace-nowrap sm:text-[12.4vw] sm:leading-none md:-mt-3 md:text-[12.2vw] lg:text-[12vw]"
+    >
+      {hasStartedName ? (
+        <>
+          {displayedText.slice(0, heroTitlePrefixLength)}
+          <span className="block sm:inline">
+            {displayedText.slice(heroTitlePrefixLength)}
+            <span className="typewriter-caret" aria-hidden="true" />
+          </span>
+        </>
+      ) : (
+        <>
+          {displayedText}
+          <span className="typewriter-caret" aria-hidden="true" />
+        </>
+      )}
+    </h1>
   );
 }
 

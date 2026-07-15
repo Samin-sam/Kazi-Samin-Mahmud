@@ -150,6 +150,35 @@ section[id] {
   transform-origin: left;
 }
 
+.typewriter-caret {
+  display: inline-block;
+  width: 0.045em;
+  height: 0.72em;
+  margin-left: 0.07em;
+  border-radius: 999px;
+  background: #bbccd7;
+  box-shadow: 0 0 16px rgba(182, 0, 168, 0.55);
+  vertical-align: -0.02em;
+  -webkit-text-fill-color: initial;
+  animation: typewriter-caret-blink 0.85s step-end infinite;
+}
+
+@keyframes typewriter-caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  50%,
+  95% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 .hero-chip {
   transition:
     box-shadow 220ms ease,
