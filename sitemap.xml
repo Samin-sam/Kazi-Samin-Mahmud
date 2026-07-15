@@ -11,12 +11,27 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://kazisamin.com/#expertise</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://kazisamin.com/#experience</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://kazisamin.com/#projects</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://kazisamin.com/#skills</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://kazisamin.com/#services</loc>
+    <loc>https://kazisamin.com/#certifications</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
